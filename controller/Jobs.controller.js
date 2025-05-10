@@ -25,16 +25,22 @@ exports.searchJobsBasedLocation = async(req, res) => {
     const currentPage = parseInt(page, 10);
     const itemsPerPage = parseInt(limit, 10);
     const escapedLocation = location.trim().replace(/\s+/g, '\\s+')
+
+    
     const query = {
       location: {$regex: escapedLocation, $options: "i"} // we are doing case sensitive search here !
     }
+    const totalCount = await Jobs.countDocuments(query);
     const jobs = await Jobs.find(query)
     .skip((currentPage -1) * itemsPerPage)
     .limit(Number(itemsPerPage));
 
+
     res.status(200).json({
       message: "Job searching success !",
-      data: jobs
+      numberOfJobs: totalCount,
+      data: jobs,
+      
     })
 
   }catch(err) {
